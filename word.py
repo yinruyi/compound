@@ -40,9 +40,12 @@ class pretreatment():
     def read_txt(self,txtPath,coding = 'utf-8'):
         import codecs
         f = codecs.open(txtPath,'r',coding).readlines()
+        dataset = []
         for line in f:
-            line=line.strip('\n')
-        return f
+            line = line.replace("\r\n","")
+            line = line.replace("\n","")
+            dataset.append(line)
+        return dataset
 
     def drop_mark(self,dataset):
         mark = ['w','wkz','wky','wyz','wyy','wj','ww','wt','wd','wf','wn','wm','ws','wp','wb','wh']
@@ -74,17 +77,56 @@ class pretreatment():
         return resultList
 
     def RemoveStopUseWords(self, dataset, wordPath, coding = 'utf-8'):
-        StopUseWords = []
-        temp = self.read_txt(wordPath,coding)
-        return temp
+        StopUseWords = self.read_txt(wordPath,coding)
+        for line in dataset:
+            if len(line) == 1:
+                if line[0] in StopUseWords:
+                    line[0] = u"*"
+            else:
+                for i in xrange(len(line)):
+                    if line[i] in StopUseWords:
+                        line[i] = u"*"
+        return dataset
+
+class MiMethod():
+    """docstring for MiMethod"""
+    def __init__(self):
+        pass
+
+    def MiMethodSelect(self, dataset, threshold1, threshold2):
+        SingleList, CoupleList = [],[]
+        for line in dataset:
+            if len(line) == 1:
+                SingleList.append(line[0])
+            else:
+                for i in range(len(line)):
+                    SingleList.append(line[i])
+                for j in xrange(len(line)-1):
+                    CoupleList.append(line[j]+u'/'+line[j+1])
+        length = len(dataset)
+        SingleDic = self.Counts(SingleList)
+        CoupleDic = self.Counts(CoupleList)
+        return SingleDic
+
+       
 
 class treatment():
     def __init__():
         pass
     def writeString(self,string,txtPath = 'out.txt'):
+        #将String写入文件
         f = open(txtPath, "a+")
         line = fo.write(string + '\n')
         f.close
+    
+    def Counts(self, datalist):
+        counts = {}
+        for i in datalist:
+            if i in counts:
+                counts[i] += 1
+            else:
+                counts[i] = 1
+        return counts
 
 #__________________________________________________________-
 #以下模块代码
@@ -95,6 +137,8 @@ def remove_stop_use_word(old_tuple):
         if i[-1] == '\n':#去掉回车符号
             i = i[0:-1]
         stop_use_word.append(i)
+    print stop_use_word
+
     for line in old_tuple:
         if len(line)==1:
             if line[0] in stop_use_word:
@@ -126,8 +170,6 @@ def get_single_couple_list(data_list):
             for j in range(len(line)-1):
                 list_couple.append(line[j]+'/'+line[j+1])
     return list_single,list_couple
-
-
 
 def get_new_data(data,frequent_list):
     new_list=[]
@@ -245,7 +287,7 @@ def over_threshold_select(list_single,list_couple,threshold1,threshold2,length):
     return result_list
 
 #-------------------------------------------------------------------
-class DataAnalysis(pretreatment,treatment):
+class DataAnalysis(pretreatment,treatment,MiMethod):
     pass
 
 
@@ -253,8 +295,10 @@ if __name__=='__main__':
     data = DataAnalysis().read_txt('data.txt')
     data = DataAnalysis().drop_mark(data)
     data = DataAnalysis().make2dList(data)
-    test = DataAnalysis().RemoveStopUseWords(data,'stop_use_words.txt')
-    print test
+    data = DataAnalysis().RemoveStopUseWords(data,'stop_use_words.txt')
+    #print data
+    a = DataAnalysis().MiMethodSelect(data, threshold1=10, threshold2=100)
+    print a
 
 
     #print first_fix(data)
