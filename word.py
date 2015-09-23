@@ -34,7 +34,7 @@ def make_tuple(data):
 
 
 class pretreatment():
-    """dataset after pretreatment"""
+    """预处理"""
     def __init__(self):
         pass
     def read_txt(self,txtPath,coding = 'utf-8'):
@@ -93,7 +93,8 @@ class MiMethod():
     def __init__(self):
         pass
 
-    def MiMethodSelect(self, dataset, threshold1, threshold2):
+    def MiMethodFP(self, dataset, threshold1, threshold2):
+        #互信息方法
         SingleList, CoupleList = [],[]
         for line in dataset:
             if len(line) == 1:
@@ -106,7 +107,28 @@ class MiMethod():
         length = len(dataset)
         SingleDic = self.Counts(SingleList)
         CoupleDic = self.Counts(CoupleList)
-        return SingleDic
+        #return CoupleDic
+        resultList = []
+        for compound,num in CoupleDic.items():
+            if num >= threshold1:
+                temp = compound.split(u'/')
+                supp_mi = 1.0*num*length/(SingleDic[temp[0]]*SingleDic[temp[1]])
+                if supp_mi >= threshold2:
+                    resultTemp = {"compound_word":compound,"num_of_compound_word":num,"mi":supp_mi}
+                    resultTemp["num_of_word1"] = SingleDic[temp[0]]
+                    resultTemp["num_of_word2"] = SingleDic[temp[1]]
+                    resultList.append(resultTemp)
+        return resultList
+
+    def MiMethodRe(self, dataset, threshold1, threshold2):
+        SingleFP = ['a']#init
+        while len(SingleFP) != 0:
+            SingleFP = 0
+            pass
+
+
+
+
 
        
 
@@ -120,6 +142,7 @@ class treatment():
         f.close
     
     def Counts(self, datalist):
+        #对List计数
         counts = {}
         for i in datalist:
             if i in counts:
@@ -127,6 +150,7 @@ class treatment():
             else:
                 counts[i] = 1
         return counts
+
 
 #__________________________________________________________-
 #以下模块代码
@@ -153,7 +177,6 @@ def find_frequent_list(data,threshold1,threshold2,length):
     list_single_data,list_couple_data=get_single_couple_list(data)
     list_fre=over_threshold_select(list_single_data,list_couple_data,threshold1,threshold2,length)
     return list_fre
-
 def get_single_couple_list(data_list):
     list_single=[]
     list_couple=[]
@@ -170,7 +193,6 @@ def get_single_couple_list(data_list):
             for j in range(len(line)-1):
                 list_couple.append(line[j]+'/'+line[j+1])
     return list_single,list_couple
-
 def get_new_data(data,frequent_list):
     new_list=[]
     for item in frequent_list:
@@ -190,7 +212,6 @@ def get_new_data(data,frequent_list):
     #new_data=[]
     new_data=wipe_out_figure(data, '*')
     return new_data
-
 def count_list_fix(data_list):
     dict_list={}
     data_list_fix=sorted(data_list)
@@ -213,7 +234,6 @@ def get_counts(data_list):
         else:
             counts[i] = 1
     return counts
-
 def wipe_out_figure(old_tuple,figure):
     new_tuple=[]
     for line in old_tuple:
@@ -231,7 +251,6 @@ def wipe_out_figure(old_tuple,figure):
                     new_line.append(line[i])
             new_tuple.append(new_line)
     return new_tuple
-
 def fix_result(old_list):
     data = []
     if len(old_list[0]) == 0:
@@ -297,7 +316,7 @@ if __name__=='__main__':
     data = DataAnalysis().make2dList(data)
     data = DataAnalysis().RemoveStopUseWords(data,'stop_use_words.txt')
     #print data
-    a = DataAnalysis().MiMethodSelect(data, threshold1=10, threshold2=100)
+    a = DataAnalysis().MiMethodFP(data, threshold1=10, threshold2=100)
     print a
 
 
