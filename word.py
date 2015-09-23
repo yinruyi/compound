@@ -122,9 +122,16 @@ class MiMethod():
 
     def MiMethodRe(self, dataset, threshold1, threshold2):
         SingleFP = ['a']#init
+        resultList = []
         while len(SingleFP) != 0:
-            SingleFP = 0
-            pass
+            SingleFP = self.MiMethodFP(dataset, threshold1, threshold2)
+            wordTemp = []
+            for item in SingleFP:
+                wordTemp.append(item["compound_word"])
+            dataset = self.UpdateDataset(dataset, wordTemp)
+            resultList.append(SingleFP)
+        return resultList
+
 
 
 
@@ -150,6 +157,37 @@ class treatment():
             else:
                 counts[i] = 1
         return counts
+
+    def UpdateDataset(self, dataset, FPList):
+        FP2DList = []
+        for item in FPList:
+            FP2DList.append(item.split(u'/'))
+        for i in xrange(len(FP2DList)):
+            for line in dataset:
+                if len(line) == 1:
+                    pass
+                else:
+                    for j in xrange(len(line)-1):
+                        if line[j] == FP2DList[i][0] and line[j+1] == FP2DList[i][1]:
+                            line[j] = line[j]+line[j+1]
+                            line[j+1] = u'*'
+        UpDataset = []
+        for line in dataset:
+            if len(line) == 1:
+                if line[0] == u'*':
+                    pass
+                else:
+                    UpDataset.append(line)
+            else:
+                tempList = []
+                for i in xrange(len(line)):
+                    if line[i] == u'*':
+                        pass
+                    else:
+                        tempList.append(line[i])
+                UpDataset.append(tempList)
+        return UpDataset
+
 
 
 #__________________________________________________________-
@@ -212,6 +250,7 @@ def get_new_data(data,frequent_list):
     #new_data=[]
     new_data=wipe_out_figure(data, '*')
     return new_data
+
 def count_list_fix(data_list):
     dict_list={}
     data_list_fix=sorted(data_list)
@@ -306,7 +345,10 @@ def over_threshold_select(list_single,list_couple,threshold1,threshold2,length):
     return result_list
 
 #-------------------------------------------------------------------
-class DataAnalysis(pretreatment,treatment,MiMethod):
+class DataAnalysis(pretreatment, treatment, CompoundMethod):
+    pass
+
+class CompoundMethod(MiMethod):
     pass
 
 
@@ -316,7 +358,7 @@ if __name__=='__main__':
     data = DataAnalysis().make2dList(data)
     data = DataAnalysis().RemoveStopUseWords(data,'stop_use_words.txt')
     #print data
-    a = DataAnalysis().MiMethodFP(data, threshold1=10, threshold2=100)
+    a = DataAnalysis().MiMethodRe(data, threshold1=10, threshold2=100)
     print a
 
 
