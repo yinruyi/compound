@@ -132,12 +132,20 @@ class MiMethod():
             resultList.append(SingleFP)
         return resultList
 
+    def fixResult(self, dataset):
+        tempList = []
+        if len(dataset) == 1:
+            return []
+        else:
+            for i in xrange(len(dataset)):
+                if len(dataset[i]) == 0:
+                    pass
+                else:
+                    pass
 
 
-
-
-
-       
+class McMethod():
+    pass
 
 class treatment():
     def __init__():
@@ -345,11 +353,12 @@ def over_threshold_select(list_single,list_couple,threshold1,threshold2,length):
     return result_list
 
 #-------------------------------------------------------------------
+class CompoundMethod(MiMethod, McMethod):
+    def __init__(self):
+        pass
 class DataAnalysis(pretreatment, treatment, CompoundMethod):
     pass
 
-class CompoundMethod(MiMethod):
-    pass
 
 
 if __name__=='__main__':
@@ -358,7 +367,7 @@ if __name__=='__main__':
     data = DataAnalysis().make2dList(data)
     data = DataAnalysis().RemoveStopUseWords(data,'stop_use_words.txt')
     #print data
-    a = DataAnalysis().MiMethodRe(data, threshold1=10, threshold2=100)
+    a = DataAnalysis().MiMethodRe(data, threshold1=10, threshold2=1000)
     print a
 
 
