@@ -130,7 +130,8 @@ class MiMethod():
                 wordTemp.append(item["compound_word"])
             dataset = self.UpdateDataset(dataset, wordTemp)
             resultList.append(SingleFP)
-        return resultList
+        resultListFixed = self.fixResult(resultList)
+        return resultListFixed
 
     def fixResult(self, dataset):
         tempList = []
@@ -141,7 +142,14 @@ class MiMethod():
                 if len(dataset[i]) == 0:
                     pass
                 else:
-                    pass
+                    for j in xrange(len(dataset[i])):
+                        if u'*' in dataset[i][j]["compound_word"]:
+                            pass
+                        else:
+                            tempList.append(dataset[i][j])
+        for item in tempList:
+            
+        return tempList
 
 
 class McMethod():
@@ -196,10 +204,7 @@ class treatment():
                 UpDataset.append(tempList)
         return UpDataset
 
-
-
 #__________________________________________________________-
-#以下模块代码
 def remove_stop_use_word(old_tuple):
     stop_use_word=[]
     data = codecs.open('stop_use_words.txt','r','utf-8').readlines()
@@ -218,7 +223,6 @@ def remove_stop_use_word(old_tuple):
                 if line[i] in stop_use_word:
                     line[i]='*'
     return old_tuple
-
 def find_frequent_list(data,threshold1,threshold2,length):
     list_single_data,list_couple_data=get_single_couple_list(data)
     list_fre=over_threshold_select(list_single_data,list_couple_data,threshold1,threshold2,length)
@@ -258,7 +262,6 @@ def get_new_data(data,frequent_list):
     #new_data=[]
     new_data=wipe_out_figure(data, '*')
     return new_data
-
 def count_list_fix(data_list):
     dict_list={}
     data_list_fix=sorted(data_list)
