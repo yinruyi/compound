@@ -59,6 +59,19 @@ class pretreatment():
                         line[i] = u"*"
         return dataset
 
+    def writeMatrix(self, dataset, Path, coding = "utf-8"):
+    	for i in xrange(len(dataset)):
+    		temp = dataset[i]
+    		temp = [str(temp[i]) for i in xrange(len(temp))]
+    		temp = ",".join(temp)
+    		dataset[i] = temp
+    	string = "\n".join(dataset)
+    	f = open(Path, "a+")
+    	line = f.write(string+"\n")
+    	f.close()
+
+
+
 class MiMethod():
     """mi/互信息方法"""
     def __init__(self):
@@ -85,7 +98,7 @@ class MiMethod():
                 temp = compound.split(u'/')
                 supp_mi = 1.0*num*length/(SingleDic[temp[0]]*SingleDic[temp[1]])
                 if supp_mi >= threshold2:
-                    resultTemp = {"compound_word":compound,"num_of_compound_word":num,"mi":supp_mi}
+                    resultTemp = {"compound_word":compound,"num_of_compound_word":num,"result":supp_mi}
                     resultTemp["num_of_word1"] = SingleDic[temp[0]]
                     resultTemp["num_of_word2"] = SingleDic[temp[1]]
                     resultTemp["compound_combined"] = temp[0]+temp[1]
@@ -287,14 +300,14 @@ if __name__=='__main__':
     data = DataAnalysis().read_txt('data.txt')
     data = DataAnalysis().drop_mark(data)
     data = DataAnalysis().make2dList(data)
-    data = DataAnalysis().RemoveStopUseWords(data,'stop_use_words.txt')
-    #print data
+    #data = DataAnalysis().RemoveStopUseWords(data,'stop_use_words.txt')
+    print len(data)
     #mi
     #resultList = DataAnalysis().MiMethodRe(data, threshold1=10, threshold2=1000)
     #mc
     #resultList = DataAnalysis().McMethodRe(data, threshold1=10, threshold2=0.8)
     #confidenceLevel
-    resultList = DataAnalysis().confidenceLevelMethodRe(data, threshold1=10, threshold2=0.8)
-    print resultList
+    #resultList = DataAnalysis().confidenceLevelMethodRe(data, threshold1=10, threshold2=0.8)
+    #print resultList
 
     
