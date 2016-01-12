@@ -3,6 +3,9 @@
 #author:fitz_yin
 
 import codecs
+import sys
+reload(sys)
+sys.setdefaultencoding( "utf-8" )
 
 class pretreatment():
     """预处理"""
@@ -20,6 +23,23 @@ class pretreatment():
 
     def drop_mark(self,dataset):
         mark = ['w','wkz','wky','wyz','wyy','wj','ww','wt','wd','wf','wn','wm','ws','wp','wb','wh']
+        #print mark
+        dataset = ' '.join(dataset)
+        dataset = dataset.split()
+        for i in xrange(len(dataset)):
+            temp = []
+            temp = dataset[i].split('/')
+            if len(temp) == 2:
+                if temp[1] in mark:
+                    dataset[i] = u'*'
+                else:
+                    dataset[i] = temp[0]
+            else:
+                dataset[i] = u'*'
+        return dataset
+
+    def drop_mark2(self,dataset):
+        mark = ['w','wkz','wky','wyz','wyy','wj','ww','wt','wd','wf','wn','wm','ws','wp','wb','wh',"tyc"]
         #print mark
         dataset = ' '.join(dataset)
         dataset = dataset.split()
@@ -144,7 +164,7 @@ class McMethod():
                 temp = compound.split(u'/')
                 supp_mc = 1.0*num/min(SingleDic[temp[0]],SingleDic[temp[1]])
                 if supp_mc >= threshold2:
-                    resultTemp = {"compound_word":compound,"num_of_compound_word":num,"mc":supp_mc}
+                    resultTemp = {"compound_word":compound,"num_of_compound_word":num,"result":supp_mc}
                     resultTemp["num_of_word1"] = SingleDic[temp[0]]
                     resultTemp["num_of_word2"] = SingleDic[temp[1]]
                     resultTemp["compound_combined"] = temp[0]+temp[1]
@@ -190,7 +210,7 @@ class confidenceLevelMethod():
                 temp = compound.split(u'/')
                 supp_cl = 1.0*num/SingleDic[temp[0]]
                 if supp_cl >= threshold2:
-                    resultTemp = {"compound_word":compound,"num_of_compound_word":num,"confidenceLevel":supp_cl}
+                    resultTemp = {"compound_word":compound,"num_of_compound_word":num,"result":supp_cl}
                     resultTemp["num_of_word1"] = SingleDic[temp[0]]
                     resultTemp["num_of_word2"] = SingleDic[temp[1]]
                     resultTemp["compound_combined"] = temp[0]+temp[1]
@@ -290,7 +310,14 @@ class treatment():
 
     def fix2write(self, dataset):
     	resultType = ["compound_combined","compound_word","num_of_compound_word","num_of_word1","num_of_word2","result"]
-    	
+    	resultList = []
+    	for i in xrange(len(dataset)):
+    		temp = []
+    		for j in xrange(len(resultType)):
+    			temp.append(dataset[i][resultType[j]])
+    		resultList.append(temp)
+    	return resultList
+
 
 
 class CompoundMethod(MiMethod, McMethod, confidenceLevelMethod):
@@ -303,18 +330,25 @@ class DataAnalysis(pretreatment, treatment, CompoundMethod):
 if __name__=='__main__':
     data = DataAnalysis().read_txt('data.txt')
     data = DataAnalysis().drop_mark(data)
+    #data = DataAnalysis().drop_mark2(data)
     data = DataAnalysis().make2dList(data)
     #data = DataAnalysis().RemoveStopUseWords(data,'stop_use_words.txt')
     print len(data)
     
-    DataAnalysis().writeMatrix([["句子数量",len(data),"方法","mi","support","10","阈值","1000"],
-    	[""]], "test.txt")
-    #mi
-    resultList = DataAnalysis().MiMethodRe(data, threshold1=20, threshold2=2000)
-    #mc
-    #resultList = DataAnalysis().McMethodRe(data, threshold1=10, threshold2=0.8)
-    #confidenceLevel
-    #resultList = DataAnalysis().confidenceLevelMethodRe(data, threshold1=10, threshold2=0.8)
-    print resultList
-
+    DataAnalysis().writeMatrix([["复旦计算机","句子数量",len(data),"方法","mc","support","10","阈值","0.4"],
+    	["复合词","复合词","复合词数量","词1数量","词2数量","方法算出值"]], "result.txt")
+#mi
+    #resultList = DataAnalysis().MiMethodRe(data, threshold1=20, threshold2=2000)
+#mc
+    #resultList = DataAnalysis().McMethodRe(data, threshold1=10, threshold2=0.4)
+#confidenceLevel
+    #resultList = DataAnalysis().confidenceLevelMethodRe(data, threshold1=20, threshold2=0.8)
+    #print resultList
+#dmc
+	#resultList = DataAnalysis().McMethodRe(data, threshold1=10, threshold2=0.4)
+#support
+	#resultList = DataAnalysis().McMethodRe(data, threshold1=10, threshold2=0.4)
+    resultList = DataAnalysis().fix2write(resultList)
+    print resultList[0]
+    DataAnalysis().writeMatrix(resultList,"result.txt")
     
