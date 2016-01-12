@@ -302,6 +302,7 @@ if __name__=='__main__':
     data = DataAnalysis().make2dList(data)
     #data = DataAnalysis().RemoveStopUseWords(data,'stop_use_words.txt')
     print len(data)
+    DataAnalysis().writeMatrix([[len(data)]], "test.txt")
     #mi
     #resultList = DataAnalysis().MiMethodRe(data, threshold1=10, threshold2=1000)
     #mc
