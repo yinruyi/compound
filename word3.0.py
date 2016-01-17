@@ -133,6 +133,7 @@ class MiMethod():
             SingleFP = self.MiMethodFP(dataset, threshold1, threshold2)
             wordTemp = []
             for item in SingleFP:
+                #print type(item)
                 wordTemp.append(item["compound_word"])
             dataset = self.UpdateDataset(dataset, wordTemp)
             resultList.append(SingleFP)
@@ -165,7 +166,7 @@ class McMethod():
                 temp = compound.split(u'/')
                 supp_mc = 1.0*num/min(SingleDic[temp[0]],SingleDic[temp[1]])
                 if supp_mc >= threshold2:
-                    resultTemp = {"compound_word":compound,"num_of_compound_word":num,"mc":supp_mc}
+                    resultTemp = {"compound_word":compound,"num_of_compound_word":num,"result":supp_mc}
                     resultTemp["num_of_word1"] = SingleDic[temp[0]]
                     resultTemp["num_of_word2"] = SingleDic[temp[1]]
                     resultTemp["compound_combined"] = temp[0]+temp[1]
@@ -178,12 +179,14 @@ class McMethod():
         while len(SingleFP) != 0:
             SingleFP = self.McMethodFP(dataset, threshold1, threshold2)
             wordTemp = []
+            #print type(SingleFP[0])
             for item in SingleFP:
+                #print item
                 wordTemp.append(item["compound_word"])
             dataset = self.UpdateDataset(dataset, wordTemp)
             resultList.append(SingleFP)
         resultListFixed = self.fixResult(resultList)
-        return resultListFixed
+        return resultListFixed,dataset
 
 class confidenceLevelMethod():
     """confidenceLevel/置信度方法"""
@@ -211,7 +214,7 @@ class confidenceLevelMethod():
                 temp = compound.split(u'/')
                 supp_cl = 1.0*num/SingleDic[temp[0]]
                 if supp_cl >= threshold2:
-                    resultTemp = {"compound_word":compound,"num_of_compound_word":num,"confidenceLevel":supp_cl}
+                    resultTemp = {"compound_word":compound,"num_of_compound_word":num,"result":supp_cl}
                     resultTemp["num_of_word1"] = SingleDic[temp[0]]
                     resultTemp["num_of_word2"] = SingleDic[temp[1]]
                     resultTemp["compound_combined"] = temp[0]+temp[1]
@@ -229,7 +232,7 @@ class confidenceLevelMethod():
             dataset = self.UpdateDataset(dataset, wordTemp)
             resultList.append(SingleFP)
         resultListFixed = self.fixResult(resultList)
-        return resultListFixed
+        return resultListFixed,dataset
 
 
 class treatment():
@@ -340,6 +343,7 @@ class treatment():
         for i in xrange(len(dataset)):
             temp = []
             for j in xrange(len(resultType)):
+                #print dataset[i],resultType[j]
                 temp.append(dataset[i][resultType[j]])
             resultList.append(temp)
         return resultList
@@ -369,7 +373,7 @@ def d_preData(path):
     data = DataAnalysis().make2dList(data)
     return data
 
-def main(path, method, threshold1, threshold2):
+def main(path, method, threshold1, threshold2=0):
     writePath = "result.txt"
     if method == "mi":
         data = preData(path)
@@ -395,23 +399,38 @@ def main(path, method, threshold1, threshold2):
         resultList = DataAnalysis().compare2getResult(preData(path), dataset, tempList, threshold1)
         resultList = DataAnalysis().fix2write(resultList)
         DataAnalysis().writeMatrix(resultList,"result.txt")
+    elif method == "dmc":
+        data = d_preData(path)
+        DataAnalysis().writeMatrix([["句子数量",len(data),"方法",method,"support",threshold1,"阈值",threshold2],
+            ["复合词","复合词","复合词数量","词1数量","词2数量","方法算出值"]], writePath)
+        tempList, dataset = DataAnalysis().McMethodRe(data, threshold1, threshold2)
+        resultList = DataAnalysis().compare2getResult(preData(path), dataset, tempList, threshold1)
+        resultList = DataAnalysis().fix2write(resultList)
+        DataAnalysis().writeMatrix(resultList,"result.txt")
+    elif method == "support":
+        data = preData(path)
+        threshold2 = 0
+        DataAnalysis().writeMatrix([["句子数量",len(data),"方法",method,"support",threshold1,"阈值",threshold2],
+            ["复合词","复合词","复合词数量","词1数量","词2数量","方法算出值"]], writePath)
+        tempList, dataset = DataAnalysis().McMethodRe(data, threshold1, threshold2)
+        resultList = DataAnalysis().compare2getResult(preData(path), dataset, tempList, threshold1)
+        resultList = DataAnalysis().fix2write(resultList)
+        DataAnalysis().writeMatrix(resultList,"result.txt")
+    elif method == "dsupport":
+        data = d_preData(path)
+        threshold2 = 0
+        DataAnalysis().writeMatrix([["句子数量",len(data),"方法",method,"support",threshold1,"阈值",threshold2],
+            ["复合词","复合词","复合词数量","词1数量","词2数量","方法算出值"]], writePath)
+        tempList, dataset = DataAnalysis().McMethodRe(data, threshold1, threshold2)
+        resultList = DataAnalysis().compare2getResult(preData(path), dataset, tempList, threshold1)
+        resultList = DataAnalysis().fix2write(resultList)
+        DataAnalysis().writeMatrix(resultList,"result.txt")
 
 
 if __name__=='__main__':
-    #data = preData("data.txt")
-    #data = DataAnalysis().RemoveStopUseWords(data,'stop_use_words.txt')
-    #print len(data)
-    #DataAnalysis().writeMatrix([[len(data)]], "test.txt")
-    #mi
-    #tempList, dataset = DataAnalysis().MiMethodRe(data, threshold1=5, threshold2=100)
-    #print dataset[2],data[2]
-    #resultList = DataAnalysis().compare2getResult(preData("data.txt"), dataset, tempList, threshold1=5)
-    #mc
-    #resultList = DataAnalysis().McMethodRe(data, threshold1=10, threshold2=0.8)
-    #confidenceLevel
-    #resultList = DataAnalysis().confidenceLevelMethodRe(data, threshold1=10, threshold2=0.8)
-    #print resultList
-    #main("data.txt", "mi",5,100)
-    main("data.txt","mc",20,0.8)
-
-    
+    #main("data.txt", "mi",5,300)
+    #main("data.txt","mc",20,0.8)
+    #main("data.txt","confidence",20,0.8)
+    #main("data.txt","dmc",20,0.8)
+    #main("data.txt","support",20)
+    #main("data.txt","dsupport",20)
