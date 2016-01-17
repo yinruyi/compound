@@ -1,8 +1,11 @@
-#coding:utf-8
-#version:2.0
+##coding:utf-8
+#version:3.0
 #author:fitz_yin
 
 import codecs
+import sys
+reload(sys)
+sys.setdefaultencoding( "utf-8" )
 
 class pretreatment():
     """预处理"""
@@ -19,13 +22,31 @@ class pretreatment():
         return dataset
 
     def drop_mark(self,dataset):
-        mark = ['w','wkz','wky','wyz','wyy','wj','ww','wt','wd','wf','wn','wm','ws','wp','wb','wh']
+        mark = ['w','wkz','wky','wyz','wyy','wj','ww','wt','wd','wf','wn','wm','ws','wp','wb','wh',"tyc"]
         #print mark
         dataset = ' '.join(dataset)
         dataset = dataset.split()
         for i in xrange(len(dataset)):
             temp = []
             temp = dataset[i].split('/')
+            if len(temp) == 2:
+                if temp[1] in mark:
+                    dataset[i] = u'*'
+                else:
+                    dataset[i] = temp[0]
+            else:
+                dataset[i] = u'*'
+        return dataset
+
+    def drop_mark2(self,dataset):
+    	#用于删词性
+        mark = ['w','wkz','wky','wyz','wyy','wj','ww','wt','wd','wf','wn','wm','ws','wp','wb','wh',"tyc","t", "tg", "f", "r", "rr", "rz", "rzt", "rzs", "rzv", "ry", "ryt", "rys", "ryv", "rg", "m", "mq", "q", "qv", "qt", "d", "p", "pba", "pbei", "c", "cc", "u", "uzhe", "ule", "uguo", "ude1", "ude2", "ude3", "usuo", "udeng", "uyy", "udh", "uls", "uzhi", "ulian", "e", "y", "o", "x", "xx", "xu"]
+        #print mark
+        dataset = ' '.join(dataset)
+        dataset = dataset.split()
+        for i in xrange(len(dataset)):
+            temp = []
+            temp = dataset[i].split(u'/')
             if len(temp) == 2:
                 if temp[1] in mark:
                     dataset[i] = u'*'
@@ -116,7 +137,7 @@ class MiMethod():
             dataset = self.UpdateDataset(dataset, wordTemp)
             resultList.append(SingleFP)
         resultListFixed = self.fixResult(resultList)
-        return resultListFixed
+        return resultListFixed,dataset
 
 class McMethod():
     """mc/最大置信度方法"""
@@ -275,18 +296,39 @@ class treatment():
                             pass
                         else:
                             tempList.append(dataset[i][j])
-        for i in xrange(len(tempList)):
-            for j in xrange(len(tempList)):
-                if i == j:
-                    pass
-                else:
-                    if tempList[i]["compound_combined"] in tempList[j]["compound_combined"]:
-                        tempList[i]["compound_combined"] = u'*'
-        resultList = []
-        for i in xrange(len(tempList)):
-            if tempList[i]["compound_combined"] != u"*":
-                resultList.append(tempList[i])           
+        #for i in xrange(len(tempList)):
+        #    for j in xrange(len(tempList)):
+        #        if i == j:
+        #            pass
+        #        else:
+        #            if tempList[i]["compound_combined"] in tempList[j]["compound_combined"]:
+        #                tempList[i]["compound_combined"] = u'*'
+        #resultList = []
+        #for i in xrange(len(tempList)):
+        #    if tempList[i]["compound_combined"] != u"*":
+        #        resultList.append(tempList[i])
+        resultList = tempList          
         return resultList
+    def compare2getResult(self, data, dataset, tempList):
+        resultList = []
+        for i in xrange(len(dataset)):
+            if len(data[i]) == len(dataset[i]):
+                pass
+            else:
+                temp = dataset[i]
+                if len(temp) != 0:
+                    for j in xrange(len(temp)):
+                        if temp[j] not in data[i]:
+                            resultList.append(temp[j])
+        resultList = self.Counts(resultList)
+        print resultList,len(resultList)
+        print tempList,len(tempList)
+
+
+
+
+
+
 
 
 class CompoundMethod(MiMethod, McMethod, confidenceLevelMethod):
@@ -300,11 +342,14 @@ if __name__=='__main__':
     data = DataAnalysis().read_txt('data.txt')
     data = DataAnalysis().drop_mark(data)
     data = DataAnalysis().make2dList(data)
+    data_pre = data
     #data = DataAnalysis().RemoveStopUseWords(data,'stop_use_words.txt')
-    print len(data)
-    DataAnalysis().writeMatrix([[len(data)]], "test.txt")
+    #print len(data)
+    #DataAnalysis().writeMatrix([[len(data)]], "test.txt")
     #mi
-    #resultList = DataAnalysis().MiMethodRe(data, threshold1=10, threshold2=1000)
+    tempList, dataset = DataAnalysis().MiMethodRe(data, threshold1=10, threshold2=100)
+    #print dataset[2],data[2]
+    resultList = DataAnalysis().compare2getResult(data_pre, dataset, tempList)
     #mc
     #resultList = DataAnalysis().McMethodRe(data, threshold1=10, threshold2=0.8)
     #confidenceLevel
