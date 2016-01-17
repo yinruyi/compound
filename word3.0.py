@@ -81,15 +81,15 @@ class pretreatment():
         return dataset
 
     def writeMatrix(self, dataset, Path, coding = "utf-8"):
-    	for i in xrange(len(dataset)):
-    		temp = dataset[i]
-    		temp = [str(temp[i]) for i in xrange(len(temp))]
-    		temp = ",".join(temp)
-    		dataset[i] = temp
-    	string = "\n".join(dataset)
-    	f = open(Path, "a+")
-    	line = f.write(string+"\n")
-    	f.close()
+        for i in xrange(len(dataset)):
+            temp = dataset[i]
+            temp = [str(temp[j]) for j in xrange(len(temp))]
+            temp = ",".join(temp)
+            dataset[i] = temp
+        string = "\n".join(dataset)
+        f = open(Path, "a+")
+        line = f.write(string+"\n")
+        f.close()
 
 
 
@@ -331,10 +331,18 @@ class treatment():
         for i in xrange(len(tempList)):
             if tempList[i]["compound_combined"] in resultList:
                 result.append(tempList[i])
-        print result,len(result)
+        #print result,len(result)
         return result
 
-
+    def fix2write(self, dataset):
+        resultType = ["compound_combined","compound_word","num_of_compound_word","num_of_word1","num_of_word2","result"]
+        resultList = []
+        for i in xrange(len(dataset)):
+            temp = []
+            for j in xrange(len(resultType)):
+                temp.append(dataset[i][resultType[j]])
+            resultList.append(temp)
+        return resultList
 
 
 
@@ -354,20 +362,56 @@ def preData(path):
     data = DataAnalysis().drop_mark(data)
     data = DataAnalysis().make2dList(data)
     return data
+def d_preData(path):
+    #删词性的预处理
+    data = DataAnalysis().read_txt('data.txt')
+    data = DataAnalysis().drop_mark2(data)
+    data = DataAnalysis().make2dList(data)
+    return data
+
+def main(path, method, threshold1, threshold2):
+    writePath = "result.txt"
+    if method == "mi":
+        data = preData(path)
+        DataAnalysis().writeMatrix([["句子数量",len(data),"方法",method,"support",threshold1,"阈值",threshold2],
+            ["复合词","复合词","复合词数量","词1数量","词2数量","方法算出值"]], writePath)
+        tempList, dataset = DataAnalysis().MiMethodRe(data, threshold1, threshold2)
+        resultList = DataAnalysis().compare2getResult(preData(path), dataset, tempList, threshold1)
+        resultList = DataAnalysis().fix2write(resultList)
+        DataAnalysis().writeMatrix(resultList,"result.txt")
+    elif method == "mc":
+        data = preData(path)
+        DataAnalysis().writeMatrix([["句子数量",len(data),"方法",method,"support",threshold1,"阈值",threshold2],
+            ["复合词","复合词","复合词数量","词1数量","词2数量","方法算出值"]], writePath)
+        tempList, dataset = DataAnalysis().McMethodRe(data, threshold1, threshold2)
+        resultList = DataAnalysis().compare2getResult(preData(path), dataset, tempList, threshold1)
+        resultList = DataAnalysis().fix2write(resultList)
+        DataAnalysis().writeMatrix(resultList,"result.txt")
+    elif method == "confidence":
+        data = preData(path)
+        DataAnalysis().writeMatrix([["句子数量",len(data),"方法",method,"support",threshold1,"阈值",threshold2],
+            ["复合词","复合词","复合词数量","词1数量","词2数量","方法算出值"]], writePath)
+        tempList, dataset = DataAnalysis().confidenceLevelMethodRe(data, threshold1, threshold2)
+        resultList = DataAnalysis().compare2getResult(preData(path), dataset, tempList, threshold1)
+        resultList = DataAnalysis().fix2write(resultList)
+        DataAnalysis().writeMatrix(resultList,"result.txt")
+
 
 if __name__=='__main__':
-    data = preData("data.txt")
+    #data = preData("data.txt")
     #data = DataAnalysis().RemoveStopUseWords(data,'stop_use_words.txt')
     #print len(data)
     #DataAnalysis().writeMatrix([[len(data)]], "test.txt")
     #mi
-    tempList, dataset = DataAnalysis().MiMethodRe(data, threshold1=10, threshold2=100)
+    #tempList, dataset = DataAnalysis().MiMethodRe(data, threshold1=5, threshold2=100)
     #print dataset[2],data[2]
-    resultList = DataAnalysis().compare2getResult(preData("data.txt"), dataset, tempList, threshold1=10)
+    #resultList = DataAnalysis().compare2getResult(preData("data.txt"), dataset, tempList, threshold1=5)
     #mc
     #resultList = DataAnalysis().McMethodRe(data, threshold1=10, threshold2=0.8)
     #confidenceLevel
     #resultList = DataAnalysis().confidenceLevelMethodRe(data, threshold1=10, threshold2=0.8)
     #print resultList
+    #main("data.txt", "mi",5,100)
+    main("data.txt","mc",20,0.8)
 
     
