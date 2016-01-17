@@ -309,8 +309,10 @@ class treatment():
         #        resultList.append(tempList[i])
         resultList = tempList          
         return resultList
-    def compare2getResult(self, data, dataset, tempList):
+    def compare2getResult(self, data, dataset, tempList, threshold1):
+        temp_resultList = []
         resultList = []
+        result = []
         for i in xrange(len(dataset)):
             if len(data[i]) == len(dataset[i]):
                 pass
@@ -319,10 +321,20 @@ class treatment():
                 if len(temp) != 0:
                     for j in xrange(len(temp)):
                         if temp[j] not in data[i]:
-                            resultList.append(temp[j])
-        resultList = self.Counts(resultList)
-        print resultList,len(resultList)
-        print tempList,len(tempList)
+                            temp_resultList.append(temp[j])
+        temp_resultList = self.Counts(temp_resultList)
+        #print len(temp_resultList)
+        for k,v in temp_resultList.items():
+            if v >= threshold1:
+                resultList.append(k)
+        #print len(resultList)
+        for i in xrange(len(tempList)):
+            if tempList[i]["compound_combined"] in resultList:
+                result.append(tempList[i])
+        print result,len(result)
+        return result
+
+
 
 
 
@@ -336,20 +348,22 @@ class CompoundMethod(MiMethod, McMethod, confidenceLevelMethod):
 class DataAnalysis(pretreatment, treatment, CompoundMethod):
     pass
 
-
-
-if __name__=='__main__':
+def preData(path):
+    #数据预处理
     data = DataAnalysis().read_txt('data.txt')
     data = DataAnalysis().drop_mark(data)
     data = DataAnalysis().make2dList(data)
-    data_pre = data
+    return data
+
+if __name__=='__main__':
+    data = preData("data.txt")
     #data = DataAnalysis().RemoveStopUseWords(data,'stop_use_words.txt')
     #print len(data)
     #DataAnalysis().writeMatrix([[len(data)]], "test.txt")
     #mi
     tempList, dataset = DataAnalysis().MiMethodRe(data, threshold1=10, threshold2=100)
     #print dataset[2],data[2]
-    resultList = DataAnalysis().compare2getResult(data_pre, dataset, tempList)
+    resultList = DataAnalysis().compare2getResult(preData("data.txt"), dataset, tempList, threshold1=10)
     #mc
     #resultList = DataAnalysis().McMethodRe(data, threshold1=10, threshold2=0.8)
     #confidenceLevel
