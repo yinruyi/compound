@@ -20,7 +20,7 @@ class IO(object):
         return dataset
 
     def writeMatrix(self, dataset, Path, coding = "utf-8"):
-        for i in xrange(len(dataset)):
+        for i in range(len(dataset)):
             temp = dataset[i]
             temp = [str(temp[j]) for j in xrange(len(temp))]
             temp = ",".join(temp)
@@ -39,11 +39,21 @@ class preProcess(object):
                 'wd','wf','wn','wm','ws','wp','wb','wh',"tyc"]
         new_data_array = []
         for i in range(len(data_array)):
-            temp_array = data_array[i].split()        
+            temp_array = data_array[i].split()
+            if len(temp_array) != 0:
+                # [for j in range(len(temp_array)) if temp_array[j].split('/')[-1] in mark]
+                for j in range(len(temp_array)):
+                    temp_word_array = temp_array[j].split('/')
+                    if temp_word_array[-1] in mark:
+                        temp_array[j] = '*'
+                    else:
+                        temp_array[j] = temp_word_array[0]
+            temp_string = 'TODO'
+
 
     def drop_mark_stopword(self, data_array):
         pass
-        
+
 
 class baseMethod(preProcess):
     def __init__(self):
