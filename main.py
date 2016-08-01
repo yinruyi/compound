@@ -31,10 +31,54 @@ class preProcess(object):
         line = f.write(string+"\n")
         f.close()
 
-class baseMethod(preProcess):
+class baseMethod(object):
     def __init__(self, arg):
         super(baseMethod, self).__init__()
         self.arg = arg
+
+    def drop_mark(self, data_array):
+        mark = ['w','wkz','wky','wyz','wyy','wj','ww','wt',\
+                'wd','wf','wn','wm','ws','wp','wb','wh',"tyc"]
+        new_data_array = []
+        for i in range(len(data_array)):
+            temp_array = data_array[i].split()
+
+    def array_counts(self, data_array):
+        counts = {}
+        for i in data_array:
+            if i in counts:
+                counts[i] += 1
+            else:
+                counts[i] = 1
+        return counts
+
+    def drop_mark_stopword(self, data_array):
+        pass
+
+    def get_single_couple_dict(self, dataset):
+        SingleList, CoupleList = [],[]
+        for line in dataset:
+            if len(line) == 1:
+                SingleList.append(line[0])
+            else:
+                for i in range(len(line)-1):
+                    SingleList.append(line[i])
+                    CoupleList.append(line[i]+u'/'+line[i+1])
+                SingleList.append(len(line)-1)
+        return self.array_counts(SingleList), self.array_counts(CoupleList)
+
+    def find_compound_word(self, dataset, threshold_1, threshold_2):
+        pass
+
+
+class miMethod(baseMethod):
+    def __init__(self, arg):
+        super(miMethod, self).__init__()
+        self.arg = arg
+
+    def find_compound_word(self, dataset, threshold_1, threshold_2):
+        pass
+        
         
 #-------------------------------------------------------------------------
 class pretreatment():
