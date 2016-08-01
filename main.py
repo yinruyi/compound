@@ -5,10 +5,9 @@ import sys
 reload(sys)
 sys.setdefaultencoding( "utf-8" )
 
-class preProcess(object):
-    def __init__(self, arg):
-        super(preProcess, self).__init__()
-        self.arg = arg
+class IO(object):
+    def __init__(self):
+        super(IO, self).__init__()
 
     def read_txt(self, txtPath, coding = 'utf-8')
         f = codecs.open(txtPath,'r',coding).readlines()
@@ -31,17 +30,24 @@ class preProcess(object):
         line = f.write(string+"\n")
         f.close()
 
-class baseMethod(object):
-    def __init__(self, arg):
-        super(baseMethod, self).__init__()
-        self.arg = arg
+class preProcess(object):
+    def __init__(self):
+        super(preProcess).__init__()
 
     def drop_mark(self, data_array):
         mark = ['w','wkz','wky','wyz','wyy','wj','ww','wt',\
                 'wd','wf','wn','wm','ws','wp','wb','wh',"tyc"]
         new_data_array = []
         for i in range(len(data_array)):
-            temp_array = data_array[i].split()
+            temp_array = data_array[i].split()        
+
+    def drop_mark_stopword(self, data_array):
+        pass
+        
+
+class baseMethod(preProcess):
+    def __init__(self):
+        super(baseMethod, self).__init__()
 
     def array_counts(self, data_array):
         counts = {}
@@ -51,9 +57,6 @@ class baseMethod(object):
             else:
                 counts[i] = 1
         return counts
-
-    def drop_mark_stopword(self, data_array):
-        pass
 
     def get_single_couple_dict(self, dataset):
         SingleList, CoupleList = [],[]
@@ -72,9 +75,8 @@ class baseMethod(object):
 
 
 class miMethod(baseMethod):
-    def __init__(self, arg):
+    def __init__(self):
         super(miMethod, self).__init__()
-        self.arg = arg
 
     def find_compound_word(self, dataset, threshold_1, threshold_2):
         pass
