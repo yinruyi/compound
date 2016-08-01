@@ -22,6 +22,17 @@ def drop_mark(data_array):
                 new_data_array.append(temp_array[k].split())
     return new_data_array
 
+def list_split(array, split_string='*'):
+    temp_string = ' '.join(array)
+    split_string = ' ' + split_string
+    temp_array = temp_string.split(split_string)
+    return [temp_array[i].split() for i in range(len(temp_array))]
+
 if __name__ == '__main__':
     a = ['a/n b/n c/n f/n //w susuu/ws','a/n b/n c/n f/n //w susuu/ws ko/s ','','//w']
-    print drop_mark(a)
+    # print drop_mark(a)
+    b = ['a','d','*','d','s','*']
+    result = list_split(b)
+    print result
+    result = filter()
+

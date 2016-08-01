@@ -5,7 +5,7 @@ import sys
 reload(sys)
 sys.setdefaultencoding( "utf-8" )
 
-class IO(object):
+class InputOutput(object):
     def __init__(self):
         super(IO, self).__init__()
 
@@ -36,7 +36,7 @@ class preProcess(object):
 
     def drop_mark(self, data_array):
         mark = ['w','wkz','wky','wyz','wyy','wj','ww','wt',\
-                'wd','wf','wn','wm','ws','wp','wb','wh',"tyc"]
+                'wd','wf','wn','wm','ws','wp','wb','wh','tyc']
         new_data_array = []
         for i in range(len(data_array)):
             temp_array = data_array[i].split()
@@ -56,7 +56,46 @@ class preProcess(object):
         return new_data_array
 
     def drop_mark_stopword(self, data_array):
-        pass
+        mark = ['w','wkz','wky','wyz','wyy','wj','ww','wt','wd','wf','wn',\
+                'wm','ws','wp','wb','wh','tyc','t', 'tg', 'f', 'r', 'rr',\
+                'rz', 'rzt', 'rzs', 'rzv', 'ry', 'ryt', 'rys', 'ryv', 'rg',\
+                'm', 'mq', 'q', 'qv', 'qt', 'd', 'p', 'pba', 'pbei', 'c',\
+                'cc', 'u', 'uzhe', 'ule', 'uguo', 'ude1', 'ude2', 'ude3',\
+                'usuo', 'udeng', 'uyy', 'udh', 'uls', 'uzhi', 'ulian', 'e',\
+                'y', 'o', 'x', 'xx', 'xu']       
+        new_data_array = []
+        for i in range(len(data_array)):
+            temp_array = data_array[i].split()
+            if len(temp_array) != 0:
+                # [for j in range(len(temp_array)) if temp_array[j].split('/')[-1] in mark]
+                for j in range(len(temp_array)):
+                    temp_word_array = temp_array[j].split('/')
+                    if temp_word_array[-1] in mark:
+                        temp_array[j] = '*'
+                    else:
+                        temp_array[j] = temp_word_array[0]
+            temp_string = ' '.join(temp_array)
+            temp_array = temp_string.split('*')
+            for k in range(len(temp_array)):
+                if temp_array[k] != '' and temp_array[k] != ' ':
+                    new_data_array.append(temp_array[k].split())
+        return new_data_array
+
+    def remove_stopwords(self, data_array, stopwords_path, coding='utf-8'):
+        def list_split(array, split_string='*'):
+            temp_string = ' '.join(array)
+            split_string = ' ' + split_string + ' '
+            temp_array = temp_string.split(split_string)
+            return [temp_array[i].split() for i in range(len(temp_array))]
+
+        stopwords = InputOutput().read_txt(stopwords_path, coding)
+        for i in range(len(data_array)):
+            if data_array[i] != []:
+                for j in range(len(data_array[i])):
+                    # if pass
+                    if 
+
+            # TODO
 
 
 class baseMethod(preProcess):
@@ -89,6 +128,8 @@ class baseMethod(preProcess):
 
 
 class miMethod(baseMethod):
+    """mi/互信息方法
+    """
     def __init__(self):
         super(miMethod, self).__init__()
 
@@ -102,64 +143,6 @@ class pretreatment():
     def __init__(self):
         pass
 
-    def read_txt(self, txtPath, coding = 'utf-8'):
-        import codecs
-        f = codecs.open(txtPath,'r',coding).readlines()
-        f[0] = f[0].replace(u"\ufeff",u"")
-        dataset = []
-        for line in f:
-            line = line.replace("\r\n","")
-            line = line.replace("\n","")
-            dataset.append(line)
-        return dataset
-
-    def drop_mark(self,dataset):
-        mark = ['w','wkz','wky','wyz','wyy','wj','ww','wt','wd','wf','wn','wm','ws','wp','wb','wh',"tyc"]
-        #print mark
-        dataset = ' '.join(dataset)
-        dataset = dataset.split()
-        for i in xrange(len(dataset)):
-            temp = []
-            temp = dataset[i].split('/')
-            if len(temp) == 2:
-                if temp[1] in mark:
-                    dataset[i] = u'*'
-                else:
-                    dataset[i] = temp[0]
-            else:
-                dataset[i] = u'*'
-        return dataset
-
-    def drop_mark2(self,dataset):
-    	#用于删词性
-        mark = ['w','wkz','wky','wyz','wyy','wj','ww','wt','wd','wf','wn','wm','ws','wp','wb','wh',"tyc","t", "tg", "f", "r", "rr", "rz", "rzt", "rzs", "rzv", "ry", "ryt", "rys", "ryv", "rg", "m", "mq", "q", "qv", "qt", "d", "p", "pba", "pbei", "c", "cc", "u", "uzhe", "ule", "uguo", "ude1", "ude2", "ude3", "usuo", "udeng", "uyy", "udh", "uls", "uzhi", "ulian", "e", "y", "o", "x", "xx", "xu"]
-        #print mark
-        dataset = ' '.join(dataset)
-        dataset = dataset.split()
-        for i in xrange(len(dataset)):
-            temp = []
-            temp = dataset[i].split(u'/')
-            if len(temp) == 2:
-                if temp[1] in mark:
-                    dataset[i] = u'*'
-                else:
-                    dataset[i] = temp[0]
-            else:
-                dataset[i] = u'*'
-        return dataset
-
-    def make2dList(self, dataset):
-        tempString = ' '.join(dataset)
-        dataset = tempString.split(u'*')
-        tempList = []
-        for i in xrange(len(dataset)):
-            tempList.append(dataset[i].split())
-        resultList = []
-        for i in xrange(len(tempList)):
-            if tempList[i] != []:
-                resultList.append(tempList[i])
-        return resultList
-
     def RemoveStopUseWords(self, dataset, wordPath, coding = 'utf-8'):
         StopUseWords = self.read_txt(wordPath,coding)
         for line in dataset:
@@ -171,18 +154,6 @@ class pretreatment():
                     if line[i] in StopUseWords:
                         line[i] = u"*"
         return dataset
-
-    def writeMatrix(self, dataset, Path, coding = "utf-8"):
-        for i in xrange(len(dataset)):
-            temp = dataset[i]
-            temp = [str(temp[j]) for j in xrange(len(temp))]
-            temp = ",".join(temp)
-            dataset[i] = temp
-        string = "\n".join(dataset)
-        f = open(Path, "a+")
-        line = f.write(string+"\n")
-        f.close()
-
 
 
 class MiMethod():
