@@ -48,8 +48,12 @@ class preProcess(object):
                         temp_array[j] = '*'
                     else:
                         temp_array[j] = temp_word_array[0]
-            temp_string = 'TODO'
-
+            temp_string = ' '.join(temp_array)
+            temp_array = temp_string.split('*')
+            for k in range(len(temp_array)):
+                if temp_array[k] != '' and temp_array[k] != ' ':
+                    new_data_array.append(temp_array[k].split())
+        return new_data_array
 
     def drop_mark_stopword(self, data_array):
         pass
