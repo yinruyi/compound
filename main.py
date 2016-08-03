@@ -84,18 +84,18 @@ class preProcess(object):
     def remove_stopwords(self, data_array, stopwords_path, coding='utf-8'):
         def list_split(array, split_string='*'):
             temp_string = ' '.join(array)
-            split_string = ' ' + split_string + ' '
             temp_array = temp_string.split(split_string)
             return [temp_array[i].split() for i in range(len(temp_array))]
 
+        result_data_array = []
         stopwords = InputOutput().read_txt(stopwords_path, coding)
         for i in range(len(data_array)):
             if data_array[i] != []:
                 for j in range(len(data_array[i])):
-                    # if pass
-                    if 
-
-            # TODO
+                    if data_array[i][j] in stopwords:
+                        data_array[i][j] = '*'
+                result_data_array.extend(filter(lambda x:x, list_split(data_array[i])))
+        return result_data_array
 
 
 class baseMethod(preProcess):
@@ -137,24 +137,6 @@ class miMethod(baseMethod):
         pass
         
         
-#-------------------------------------------------------------------------
-class pretreatment():
-    """预处理"""
-    def __init__(self):
-        pass
-
-    def RemoveStopUseWords(self, dataset, wordPath, coding = 'utf-8'):
-        StopUseWords = self.read_txt(wordPath,coding)
-        for line in dataset:
-            if len(line) == 1:
-                if line[0] in StopUseWords:
-                    line[0] = u"*"
-            else:
-                for i in xrange(len(line)):
-                    if line[i] in StopUseWords:
-                        line[i] = u"*"
-        return dataset
-
 
 class MiMethod():
     """mi/互信息方法"""
