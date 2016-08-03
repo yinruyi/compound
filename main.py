@@ -5,9 +5,10 @@ import sys
 reload(sys)
 sys.setdefaultencoding( "utf-8" )
 
+
 class InputOutput(object):
     def __init__(self):
-        super(IO, self).__init__()
+        super(InputOutput, self).__init__()
 
     def read_txt(self, txtPath, coding = 'utf-8')
         f = codecs.open(txtPath,'r',coding).readlines()
@@ -30,9 +31,10 @@ class InputOutput(object):
         line = f.write(string+"\n")
         f.close()
 
-class preProcess(object):
+
+class PreProcess(object):
     def __init__(self):
-        super(preProcess).__init__()
+        super(PreProcess).__init__()
 
     def drop_mark(self, data_array):
         mark = ['w','wkz','wky','wyz','wyy','wj','ww','wt',\
@@ -98,9 +100,9 @@ class preProcess(object):
         return result_data_array
 
 
-class baseMethod(preProcess):
+class BaseMethod(PreProcess):
     def __init__(self):
-        super(baseMethod, self).__init__()
+        super(BaseMethod, self).__init__()
 
     def array_counts(self, data_array):
         counts = {}
@@ -112,31 +114,47 @@ class baseMethod(preProcess):
         return counts
 
     def get_single_couple_dict(self, dataset):
-        SingleList, CoupleList = [],[]
+        single_list, couple_list = [],[]
         for line in dataset:
             if len(line) == 1:
-                SingleList.append(line[0])
+                single_list.append(line[0])
             else:
                 for i in range(len(line)-1):
-                    SingleList.append(line[i])
-                    CoupleList.append(line[i]+u'/'+line[i+1])
-                SingleList.append(len(line)-1)
-        return self.array_counts(SingleList), self.array_counts(CoupleList)
+                    single_list.append(line[i])
+                    couple_list.append(line[i]+u'/'+line[i+1])
+                single_list.append(len(line)-1)
+        return self.array_counts(single_list), self.array_counts(couple_list)
 
     def find_compound_word(self, dataset, threshold_1, threshold_2):
-        pass
+        single_dict,couple_dict = self.get_single_couple_dict(dataset)
+        
 
 
-class miMethod(baseMethod):
+class MiMethod(baseMethod):
     """mi/互信息方法
     """
     def __init__(self):
-        super(miMethod, self).__init__()
+        super(MiMethod, self).__init__()
 
     def find_compound_word(self, dataset, threshold_1, threshold_2):
-        pass
+        single_dict,couple_dict = self.get_single_couple_dict(dataset)
+        result_list = []
+        for compound_word_candidate, num in couple_dict.iteritems():
+            if num >= threshold_1:
+                compound_two_word = compound_word_candidate.split('/')
+                supp_mi = 1.0*num*length/(single_dict[compound_two_word[0]]*\
+                    single_dict[compound_two_word[1]])
+                if supp_mi >= threshold_2:
+                    result_temp = {'compound_word' : compound_word_candidate,\
+                        'num_of_compound_word' : num, 'result' : supp_mi}
+                    result_temp['num_of_word_1'] = single_dict[compound_two_word[0]]
+                    result_temp['num_of_word_2'] = single_dict[compound_two_word[1]]
+                    result_temp['compound_word'] = compound_two_word[0] + \
+                                                   compound_two_word[1]
+                    result_list.append(result_temp)
+        return result_list
         
-        
+#-------------------------------------------------------------------        
 
 class MiMethod():
     """mi/互信息方法"""

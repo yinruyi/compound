@@ -48,6 +48,11 @@ def test_remove_stopwords(data_array):
             result_data_array.extend(filter(lambda x:x, list_split(data_array[i])))
     return result_data_array
 
+def test_iteritems():
+	a = {'a':1,'b':2}
+	for k,v in a.iteritems():
+		print k,v
+
 if __name__ == '__main__':
     # a = ['a/n b/n c/n f/n //w susuu/ws','a/n b/n c/n f/n //w susuu/ws ko/s ','','//w']
     # # print drop_mark(a)
@@ -56,6 +61,7 @@ if __name__ == '__main__':
     # print result
     # result = filter(lambda x:x, result)
     # print result
-    a = [['n','ds','dwe','d','we','weweas','d'],['we','wqe','d','wqe','ewqewq','d']]
-    print test_remove_stopwords(a)
+    # a = [['n','ds','dwe','d','we','weweas','d'],['we','wqe','d','wqe','ewqewq','d']]
+    # print test_remove_stopwords(a)
+    test_iteritems()
 
