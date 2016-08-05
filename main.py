@@ -127,6 +127,10 @@ class BaseMethod(PreProcess):
 
     def find_compound_word(self, dataset, threshold_1, threshold_2):
         single_dict,couple_dict = self.get_single_couple_dict(dataset)
+        pass
+
+    def update_dataset(self, data_array, word_temp):
+        pass
         
 
 
@@ -153,6 +157,18 @@ class MiMethod(baseMethod):
                                                    compound_two_word[1]
                     result_list.append(result_temp)
         return result_list
+
+    def data_analysis(self, data_array, threshold_1, threshold_2):
+        one_circle_result = ['init']
+        result_list = []
+        while len(one_circle_result) != 0:
+            one_circle_result = self.find_compound_word(data_array, threshold_1,\
+                threshold_2)
+            word_temp = [one_circle_result[i]['compound_word'] for i in \
+                range(len(one_circle_result))]
+            data_array = self.update_dataset(data_array, word_temp)
+
+            pass
         
 #-------------------------------------------------------------------        
 
