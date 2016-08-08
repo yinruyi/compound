@@ -5,6 +5,10 @@ import sys
 reload(sys)
 sys.setdefaultencoding( "utf-8" )
 
+IS_MUTI_THREAD = True
+MUTI_THREAD_NUM = 3
+if IS_MUTI_THREAD:
+    from multiprocessing.dummy import Pool as ThreadPool
 
 class InputOutput(object):
     def __init__(self):
@@ -129,8 +133,25 @@ class BaseMethod(PreProcess):
         single_dict,couple_dict = self.get_single_couple_dict(dataset)
         pass
 
-    def update_dataset(self, data_array, word_temp):
-        pass
+    def update_dataset(self, data_array, compound_word_list):
+        word_list = [compound_two_word[i].split('/') for i in range(len(compound_word_list))]
+
+        def test_update_line(line, word_list):
+            if len(line) == 1:
+                return line
+            else:
+                for i in range(len(word_list)):
+                    for j in range(len(line)-1):
+                        if line[j] == word_list[i][0] and line[j+1] == word_list[i][1]:
+                            line[j] = line[j] + line[j+1]
+                            line[j+1] = ''
+                return filter(lambda x:x, line)
+
+
+
+
+
+
         
 
 

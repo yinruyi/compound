@@ -66,8 +66,6 @@ class Data(object):
         self.module_name = module_name
         self.class_name = class_name
         self = getattr(module_name, class_name)
-
-        		        
  
 def main():  
     class_name = "TestClass" #类名  
@@ -93,6 +91,36 @@ def main():
     mtd_sub = getattr(obj,"sub")  
     print mtd_sub(2,1)  
 
+
+def test_thread(data_array, word_list):
+
+    def test_update_line(line):
+        if len(line) == 1:
+            return line
+        else:
+            for i in range(len(word_list)):
+                for j in range(len(line)-1):
+                    if line[j] == word_list[i][0] and line[j+1] == word_list[i][1]:
+                        line[j] = line[j] + line[j+1]
+                        line[j+1] = ''
+            return line
+
+    print data_array
+    IS_MUTI_THREAD = False
+    MUTI_THREAD_NUM = 3
+    if IS_MUTI_THREAD:
+        from multiprocessing.dummy import Pool as ThreadPool
+    if IS_MUTI_THREAD:
+        pool = ThreadPool(MUTI_THREAD_NUM)
+        pool.map(test_update_line, data_array)
+        data_array = [filter(lambda x:x!='',data_array[i]) for i in range(len(data_array))]
+    else:
+        # for i in range(len(data_array)):
+            # data_array[i] = filter(lambda x:x!='', test_update_line(data_array[i]))
+        data_array = [filter(lambda x:x!='', test_update_line(line)) for line in data_array]
+
+    print data_array
+
 if __name__ == '__main__':
     # a = ['a/n b/n c/n f/n //w susuu/ws','a/n b/n c/n f/n //w susuu/ws ko/s ','','//w']
     # # print drop_mark(a)
@@ -104,7 +132,10 @@ if __name__ == '__main__':
     # a = [['n','ds','dwe','d','we','weweas','d'],['we','wqe','d','wqe','ewqewq','d']]
     # print test_remove_stopwords(a)
     # test_iteritems()
-    main()
-    d = Data('test', 'TestClass')
-    print d
+    # main()
+    # d = Data('test', 'TestClass')
+    # print d
+    word_list = [['a','b'],['k','b'],['h','o']]
+    data_array = [['a','d','k','b','w','h','o'],['a','b'],[',','h','o']]
+    test_thread(data_array, word_list)
 
