@@ -5,10 +5,8 @@ import sys
 reload(sys)
 sys.setdefaultencoding( "utf-8" )
 
-IS_MUTI_THREAD = True
+IS_MUTI_THREAD = False
 MUTI_THREAD_NUM = 3
-if IS_MUTI_THREAD:
-    from multiprocessing.dummy import Pool as ThreadPool
 
 class InputOutput(object):
     def __init__(self):
@@ -136,7 +134,7 @@ class BaseMethod(PreProcess):
     def update_dataset(self, data_array, compound_word_list):
         word_list = [compound_two_word[i].split('/') for i in range(len(compound_word_list))]
 
-        def test_update_line(line, word_list):
+        def update_line(line, word_list):
             if len(line) == 1:
                 return line
             else:
@@ -147,12 +145,15 @@ class BaseMethod(PreProcess):
                             line[j+1] = ''
                 return filter(lambda x:x, line)
 
+        if IS_MUTI_THREAD:
+            from multiprocessing.dummy import Pool as ThreadPool
+            pool = ThreadPool(MUTI_THREAD_NUM)
+            pool.map(test_update_line, data_array)
+            data_array = [filter(lambda x:x!='',line) for line in data_array]
+        else:
+            data_array = [filter(lambda x:x!='', update_line(line)) for line in data_array]
+        return data_array
 
-
-
-
-
-        
 
 
 class MiMethod(baseMethod):

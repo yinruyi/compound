@@ -106,14 +106,14 @@ def test_thread(data_array, word_list):
             return line
 
     print data_array
-    IS_MUTI_THREAD = False
+    IS_MUTI_THREAD = True
     MUTI_THREAD_NUM = 3
     if IS_MUTI_THREAD:
         from multiprocessing.dummy import Pool as ThreadPool
     if IS_MUTI_THREAD:
         pool = ThreadPool(MUTI_THREAD_NUM)
         pool.map(test_update_line, data_array)
-        data_array = [filter(lambda x:x!='',data_array[i]) for i in range(len(data_array))]
+        data_array = [filter(lambda x:x!='',line) for line in data_array]
     else:
         # for i in range(len(data_array)):
             # data_array[i] = filter(lambda x:x!='', test_update_line(data_array[i]))
