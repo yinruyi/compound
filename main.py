@@ -154,6 +154,8 @@ class BaseMethod(PreProcess):
             data_array = [filter(lambda x:x!='', update_line(line)) for line in data_array]
         return data_array
 
+    def compare2result(self, )
+
 
 
 class MiMethod(baseMethod):
@@ -181,16 +183,14 @@ class MiMethod(baseMethod):
         return result_list
 
     def data_analysis(self, data_array, threshold_1, threshold_2):
-        one_circle_result = ['init']
-        result_list = []
+        data_array_orgin = data_array
+        one_circle_result = ['__init__']
+        
         while len(one_circle_result) != 0:
-            one_circle_result = self.find_compound_word(data_array, threshold_1,\
-                threshold_2)
-            word_temp = [one_circle_result[i]['compound_word'] for i in \
-                range(len(one_circle_result))]
+            one_circle_result = self.find_compound_word(data_array, threshold_1, threshold_2)
+            word_temp = [one_circle_result[i]['compound_word'] for i in range(len(one_circle_result))]
             data_array = self.update_dataset(data_array, word_temp)
 
-            pass
         
 #-------------------------------------------------------------------        
 
