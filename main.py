@@ -131,7 +131,7 @@ class BaseMethod(PreProcess):
         single_dict,couple_dict = self.get_single_couple_dict(dataset)
         pass
 
-    def update_dataset(self, data_array, compound_word_list):
+    def update_data_array(self, data_array, compound_word_list):
         word_list = [compound_two_word[i].split('/') for i in range(len(compound_word_list))]
 
         def update_line(line, word_list):
@@ -154,8 +154,24 @@ class BaseMethod(PreProcess):
             data_array = [filter(lambda x:x!='', update_line(line)) for line in data_array]
         return data_array
 
-    def compare2result(self, )
+    def data_analysis(self, data_array, threshold_1, threshold_2):
+        pass
 
+    def compare2result(self, data_orgin_array, data_array, threshold_1):
+        compound_word_candidate = []
+        compound_word_list = []
+        for i in range(len(data_array)):
+            if len(data_array[i]) != len(data_orgin_array[i]):
+                line_array = data_array[i]
+                if len(line_array) != 0:
+                    for j in range(len(line_array)):
+                        if line_array[j] not in data_orgin_array[i]:
+                            compound_word_candidate.append(line_array[j])
+        compound_word_candidate = self.array_counts(compound_word_candidate)
+        for k,v in compound_word_candidate.items():
+            if v >= threshold_1:
+                compound_word_list.append(k)
+        return compound_word_list
 
 
 class MiMethod(baseMethod):
@@ -177,23 +193,22 @@ class MiMethod(baseMethod):
                         'num_of_compound_word' : num, 'result' : supp_mi}
                     result_temp['num_of_word_1'] = single_dict[compound_two_word[0]]
                     result_temp['num_of_word_2'] = single_dict[compound_two_word[1]]
-                    result_temp['compound_word'] = compound_two_word[0] + \
-                                                   compound_two_word[1]
+                    result_temp['compound_word'] = compound_two_word[0] + compound_two_word[1]
                     result_list.append(result_temp)
         return result_list
 
     def data_analysis(self, data_array, threshold_1, threshold_2):
-        data_array_orgin = data_array
+        data_orgin_array = data_array
         one_circle_result = ['__init__']
-        
+        compound_result_list = []
         while len(one_circle_result) != 0:
             one_circle_result = self.find_compound_word(data_array, threshold_1, threshold_2)
             word_temp = [one_circle_result[i]['compound_word'] for i in range(len(one_circle_result))]
-            data_array = self.update_dataset(data_array, word_temp)
-
+            data_array = self.update_data_array(data_array, word_temp)
+            compound_result_list.append(one_circle_result)
         
-#-------------------------------------------------------------------        
 
+#-------------------------------------------------------------------        
 class MiMethod():
     """mi/互信息方法"""
     def __init__(self):
@@ -413,6 +428,7 @@ class treatment():
         #        resultList.append(tempList[i])
         resultList = tempList          
         return resultList
+
     def compare2getResult(self, data, dataset, tempList, threshold1):
         temp_resultList = []
         resultList = []
